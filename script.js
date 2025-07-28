@@ -5,8 +5,7 @@ const clearAll = document.getElementById("clear");
 // const ulList = document.querySelectorAll("li");
 const filter = document.getElementById("filter");
 
-// -----------Add an item to the list-----------
-function addItem(e) {
+function addItemOnSubmit(e) {
   e.preventDefault();
 
   let newItem = itemInput.value;
@@ -18,8 +17,20 @@ function addItem(e) {
   }
 
   // Now we create a list item
+  addItemToDom(newItem);
+
+  // Add Item to local Storage
+  addItemToLocalStorage(newItem);
+  // const ulList = document.querySelectorAll("li");
+
+  itemInput.value = "";
+  ClearUI();
+}
+
+// -----------Add an item to the list-----------
+function addItemToDom(item) {
   let li = document.createElement("li");
-  li.appendChild(document.createTextNode(newItem));
+  li.appendChild(document.createTextNode(item));
 
   const button = createButton("remove-item btn-link text-red");
 
@@ -30,10 +41,6 @@ function addItem(e) {
 
   // Appending the li to the dom
   itemList.appendChild(li);
-  itemInput.value = "";
-
-  // const ulList = document.querySelectorAll("li");
-  ClearUI();
 }
 
 function createButton(classes) {
@@ -46,6 +53,36 @@ function createIcon(classes) {
   const icon = document.createElement("i");
   icon.className = classes;
   return icon;
+}
+
+// -----------Add an item to Local Storage-----------
+function addItemToLocalStorage(item) {
+  // Theory: We cannot store array in local storage, so, we use parsing and stringify.
+
+  // const itemsFromStorage = getItemsFromStorage;
+
+  let itemsFromStorage;
+  if (localStorage.getItem("items") === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+
+  // Add Item to array
+  itemsFromStorage.push(item);
+
+  // Convert to JSON string and set to local storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
+}
+
+function getItemsFromStorage() {
+  let itemsFromStorage;
+
+  if (localStorage.getItem("items") === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
 }
 
 // -----------Remove an item from the list-----------
@@ -105,7 +142,7 @@ function filterItems(e) {
 }
 
 // -----------Event Listeners-----------
-itemForm.addEventListener("submit", addItem);
+itemForm.addEventListener("submit", addItemOnSubmit);
 itemList.addEventListener("click", removeItem);
 clearAll.addEventListener("click", clearAllBtn);
 filter.addEventListener("input", filterItems);
