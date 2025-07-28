@@ -4,6 +4,7 @@ const itemList = document.getElementById("item-list");
 const clearAll = document.getElementById("clear");
 // const ulList = document.querySelectorAll("li");
 const filter = document.getElementById("filter");
+let isEditMode = false;
 
 function displayItems() {
   const itemsFromStorage = getItemsFromStorage();
@@ -28,7 +29,6 @@ function addItemOnSubmit(e) {
 
   // Add Item to local Storage
   addItemToLocalStorage(newItem);
-  // const ulList = document.querySelectorAll("li");
 
   itemInput.value = "";
   ClearUI();
@@ -67,13 +67,6 @@ function addItemToLocalStorage(item) {
 
   const itemsFromStorage = getItemsFromStorage();
 
-  // let itemsFromStorage;
-  // if (localStorage.getItem("items") === null) {
-  //   itemsFromStorage = [];
-  // } else {
-  //   itemsFromStorage = JSON.parse(localStorage.getItem("items"));
-  // }
-
   // Add Item to array
   itemsFromStorage.push(item);
 
@@ -92,22 +85,34 @@ function getItemsFromStorage() {
   return itemsFromStorage;
 }
 
-// -----------Remove an item from the list-----------
-function removeItem(e) {
-  // console.log(e.target);
-  // e.target.remove(); // This just removes the cross button! LOL LMAO
-  // console.log(e.target.parentElement);
-  // e.target.parentElement.remove();
-  // We use event delegation for this.
-
-  // console.log(e.target.parentElement.classList);
+function onClickItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm("Are you sure?")) {
-      e.target.parentElement.parentElement.remove();
-    }
-    // i -> button -> li
+    removeItem(e.target.parentElement.parentElement);
+    ClearUI();
+  } else {
   }
-  ClearUI();
+}
+
+// -----------Remove an item from the list-----------
+function removeItem(item) {
+  if (confirm("Are you sure?")) {
+    item.remove();
+
+    // Remove item from storage
+    removeItemFromStorage(item);
+  }
+
+  // i -> button -> li
+}
+
+function removeItemFromStorage(item) {
+  let itemsFromStorage = getItemsFromStorage();
+
+  // Filter out item to be removed
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item.textContent);
+
+  // Re-set it to local storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
 // -----------Clear the whole list-----------
@@ -116,13 +121,16 @@ function clearAllBtn() {
     while (itemList.firstChild) {
       itemList.removeChild(itemList.firstChild);
     }
+
+    // Clear from local storage
+    localStorage.removeItem("items");
+
     ClearUI();
   }
 }
 
 // -----------Clear UI-----------
 function ClearUI() {
-  // console.log(ulList.length);
   const ulList = document.querySelectorAll("li");
   if (ulList.length === 0) {
     filter.style.display = "none";
@@ -152,7 +160,7 @@ function filterItems(e) {
 function init() {
   // -----------Event Listeners-----------
   itemForm.addEventListener("submit", addItemOnSubmit);
-  itemList.addEventListener("click", removeItem);
+  itemList.addEventListener("click", onClickItem);
   clearAll.addEventListener("click", clearAllBtn);
   filter.addEventListener("input", filterItems);
   document.addEventListener("DOMContentLoaded", displayItems);
