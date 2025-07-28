@@ -5,6 +5,13 @@ const clearAll = document.getElementById("clear");
 // const ulList = document.querySelectorAll("li");
 const filter = document.getElementById("filter");
 
+function displayItems() {
+  const itemsFromStorage = getItemsFromStorage();
+  itemsFromStorage.forEach((item) => addItemToDom(item));
+  ClearUI();
+}
+
+// -----------Add an item to the list-----------
 function addItemOnSubmit(e) {
   e.preventDefault();
 
@@ -27,7 +34,6 @@ function addItemOnSubmit(e) {
   ClearUI();
 }
 
-// -----------Add an item to the list-----------
 function addItemToDom(item) {
   let li = document.createElement("li");
   li.appendChild(document.createTextNode(item));
@@ -59,14 +65,14 @@ function createIcon(classes) {
 function addItemToLocalStorage(item) {
   // Theory: We cannot store array in local storage, so, we use parsing and stringify.
 
-  // const itemsFromStorage = getItemsFromStorage;
+  const itemsFromStorage = getItemsFromStorage();
 
-  let itemsFromStorage;
-  if (localStorage.getItem("items") === null) {
-    itemsFromStorage = [];
-  } else {
-    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
-  }
+  // let itemsFromStorage;
+  // if (localStorage.getItem("items") === null) {
+  //   itemsFromStorage = [];
+  // } else {
+  //   itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  // }
 
   // Add Item to array
   itemsFromStorage.push(item);
@@ -83,6 +89,7 @@ function getItemsFromStorage() {
   } else {
     itemsFromStorage = JSON.parse(localStorage.getItem("items"));
   }
+  return itemsFromStorage;
 }
 
 // -----------Remove an item from the list-----------
@@ -141,9 +148,15 @@ function filterItems(e) {
   });
 }
 
-// -----------Event Listeners-----------
-itemForm.addEventListener("submit", addItemOnSubmit);
-itemList.addEventListener("click", removeItem);
-clearAll.addEventListener("click", clearAllBtn);
-filter.addEventListener("input", filterItems);
-ClearUI();
+// -----------Initialize App-----------
+function init() {
+  // -----------Event Listeners-----------
+  itemForm.addEventListener("submit", addItemOnSubmit);
+  itemList.addEventListener("click", removeItem);
+  clearAll.addEventListener("click", clearAllBtn);
+  filter.addEventListener("input", filterItems);
+  document.addEventListener("DOMContentLoaded", displayItems);
+  ClearUI();
+}
+
+init();
