@@ -32,6 +32,10 @@ function addItemOnSubmit(e) {
     itemToEdit.classList.remove("edit-mode");
     itemToEdit.remove(); // Complete remove
     // Then it will automatically proceed to add the updated item.
+  } else {
+    if (checkIfItemExists(newItem)) {
+      alert("The item already exists");
+    }
   }
 
   // Now we create a list item
@@ -102,6 +106,11 @@ function onClickItem(e) {
   } else {
     setItemToEdit(e.target);
   }
+}
+
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemsFromStorage();
+  return itemsFromStorage.includes(item);
 }
 
 function setItemToEdit(item) {
