@@ -2,8 +2,9 @@ const itemForm = document.getElementById("item-form");
 const itemInput = document.getElementById("item-input");
 const itemList = document.getElementById("item-list");
 const clearAll = document.getElementById("clear");
-// const ulList = document.querySelectorAll("li");
 const filter = document.getElementById("filter");
+const formBtn = itemForm.querySelector("button");
+
 let isEditMode = false;
 
 function displayItems() {
@@ -22,6 +23,15 @@ function addItemOnSubmit(e) {
   if (newItem === "") {
     alert("Enter an item");
     return;
+  }
+
+  // Check for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemList.querySelector(".edit-mode");
+    removeItemFromStorage(itemToEdit);
+    itemToEdit.classList.remove("edit-mode");
+    itemToEdit.remove(); // Complete remove
+    // Then it will automatically proceed to add the updated item.
   }
 
   // Now we create a list item
@@ -90,7 +100,23 @@ function onClickItem(e) {
     removeItem(e.target.parentElement.parentElement);
     ClearUI();
   } else {
+    setItemToEdit(e.target);
   }
+}
+
+function setItemToEdit(item) {
+  isEditMode = true;
+  // Change the style of item selected for editing purposes.
+  // Making a class in css for this purpose : edit-mode
+
+  itemList
+    .querySelectorAll("li")
+    .forEach((i) => i.classList.remove("edit-mode"));
+
+  item.classList.add("edit-mode");
+  formBtn.innerHTML = '<i class = "fa-solid fa-pen"></i>  Update Item';
+  formBtn.style.backgroundColor = "#228B22";
+  itemInput.value = item.textContent;
 }
 
 // -----------Remove an item from the list-----------
@@ -139,6 +165,10 @@ function ClearUI() {
     filter.style.display = "block";
     clearAll.style.display = "block";
   }
+
+  formBtn.innerHTML = '<i class = "fa-solid fa-plus"></i>   Add Item';
+  formBtn.style.backgroundColor = "#333";
+  isEditMode = false;
 }
 
 // -----------Filtering items in the List-----------
